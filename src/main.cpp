@@ -23,18 +23,17 @@ Se umidade < LIMITE_MAXIMO - ((LIMITE_MAXIMO - LIMITE_MINIMO)/2): Notificação 
 Se umidade >= LIMITE_MAXIMO: Limpar área de notificações e LED Verde.
 */
 
-#define IO_USERNAME "breno_almeida"
-#define IO_KEY "change_here"
+
+#define IO_USERNAME "CHANGE_HERE"
+#define IO_KEY "CHANGE_HERE"
 
 #define PIN_RGB_B 32
 #define PIN_RGB_G 33
 #define PIN_RGB_R 25
 #define PIN_SENSOR 26
 
-#define MSG_BUFFER_SIZE	(50)
-
-const char* ssid = "Wokwi-GUEST";
-const char* password ="";
+const char* ssid = "CHANGE_HERE";
+const char* password ="CHANGE_HERE";
 
 const char* mqttserver = "io.adafruit.com";
 const int mqttport = 1883;
@@ -42,7 +41,7 @@ const char* mqttUser = IO_USERNAME;
 const char* mqttPassword = IO_KEY;
 
 const int BOARD_RESOLUTION = 4096; // The analogic board resolution, for example Arduino Uno is 10 bit (from 0 to 1023)
-const float OPERATIONAL_VOLTAGE = 3.3; // The default Esp32 voltage
+const float OPERATIONAL_VOLTAGE = 3.3; // The default ESP32 voltage
 const float MAX_SENSOR_VOLTAGE = 3.0; // The maximum voltage that the sensor can output
 const float SENSOR_READ_RATIO = OPERATIONAL_VOLTAGE / MAX_SENSOR_VOLTAGE; // The ratio betwent the two voltages
 
@@ -70,8 +69,8 @@ void reconnect() {
     clientId += String(random(0xffff), HEX);
     if (client.connect(clientId.c_str(), mqttUser, mqttPassword)) {
       // Serial.println("conectado");
-      client.subscribe("breno_almeida/feeds/min-humidity");
-      client.subscribe("breno_almeida/feeds/max-humidity");
+      client.subscribe(IO_USERNAME + "/feeds/min-humidity");
+      client.subscribe(IO_USERNAME + "/feeds/max-humidity");
     } else {
       Serial.print("Falha, rc=");
       Serial.print(client.state());
@@ -223,6 +222,7 @@ void loop() {
   String notificationMsg = "";
   String dashboardColor = "";
   double humidity;
+
   if (!client.connected()) {
     reconnect();
   }
@@ -235,7 +235,7 @@ void loop() {
   Serial.println(moistureAnalogicVal);
   humidity = map(moistureAnalogicVal, 3400, 1400, 0, 100); // para o sensor usado
   
-  if(humidity > lastHumidityValue + 3) { // umidade atual > umidade lida anteriormente => planta aguada; +1% de margem de erro
+  if(humidity > lastHumidityValue + 2) { // umidade atual > umidade lida anteriormente => planta aguada; +2% de margem de erro
     // escrever no arquivo .log se a umidade for diferente de 0
     writeFile(ntp.getFormattedDate() + ": ", "/files/humidity_log.txt", "a", false);
     writeFile("Umidade " + String(humidity, 1) + "%.", "/files/humidity_log.txt"); // spiffs
@@ -260,12 +260,12 @@ void loop() {
     notificationMsg = "-";
     dashboardColor = "#00FF00";
   }
-  Serial.println(dashboardColor);
-  Serial.println(String(humidity, 1));
-  Serial.println(notificationMsg);
-  client.publish("breno_almeida/feeds/rgb-led", dashboardColor.c_str());
-  client.publish("breno_almeida/feeds/module-humidity", String(humidity, 1).c_str());
-  client.publish("breno_almeida/feeds/notification-msg", notificationMsg.c_str());
+  client.publish(IO_USERNAME + "/feeds/rgb-led", dashboardColor.c_str());
+  client.publish(IO_USERNAME + "/feeds/module-humidity", String(humidity, 1).c_str());
+  client.publish(IO_USERNAME + "/feeds/notification-msg", notificationMsg.c_str());
+  // Serial.println(dashboardColor);
+  // Serial.println(String(humidity, 1));
+  // Serial.println(notificationMsg);
 
   lastHumidityValue = humidity;
 

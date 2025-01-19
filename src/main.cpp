@@ -69,8 +69,8 @@ void reconnect() {
     clientId += String(random(0xffff), HEX);
     if (client.connect(clientId.c_str(), mqttUser, mqttPassword)) {
       // Serial.println("conectado");
-      client.subscribe(IO_USERNAME + "/feeds/min-humidity");
-      client.subscribe(IO_USERNAME + "/feeds/max-humidity");
+      client.subscribe("breno_almeida/feeds/min-humidity");
+      client.subscribe("breno_almeida/feeds/max-humidity");
     } else {
       Serial.print("Falha, rc=");
       Serial.print(client.state());
@@ -260,9 +260,9 @@ void loop() {
     notificationMsg = "-";
     dashboardColor = "#00FF00";
   }
-  client.publish(IO_USERNAME + "/feeds/rgb-led", dashboardColor.c_str());
-  client.publish(IO_USERNAME + "/feeds/module-humidity", String(humidity, 1).c_str());
-  client.publish(IO_USERNAME + "/feeds/notification-msg", notificationMsg.c_str());
+  client.publish("breno_almeida/feeds/rgb-led", dashboardColor.c_str());
+  client.publish("breno_almeida/feeds/module-humidity", String(humidity, 1).c_str());
+  client.publish("breno_almeida/feeds/notification-msg", notificationMsg.c_str());
   // Serial.println(dashboardColor);
   // Serial.println(String(humidity, 1));
   // Serial.println(notificationMsg);
